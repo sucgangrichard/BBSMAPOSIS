@@ -1,1 +1,1 @@
-This form displays the total quantity of each item from the inventory system. It uses two colors for indication: green and red. A red mark indicates that the product is nearing stockout, while a green mark signifies that the stock level is satisfactory.
+This figure illustrates the categorization of stock. It will be sorted and managed upon receipt. The administrator has the ability to add, edit, and delete categories.

@@ -71,7 +71,7 @@ echo'
   <li class="list-group-item"><b>Barcode</b> <span class="badge badge-light float-right">'.bar128($row->barcode).'</span></li>
   <li class="list-group-item"><b>Product Name</b><span class="badge badge-warning float-right">'.$row->product_name.'</span></li>
   <li class="list-group-item"><b>Category</b> <span class="badge badge-success float-right">'.$row->category.'</span></li>
-  <li class="list-group-item"><b>Description </b><span class="badge badge-primary float-right">'.$row->description.'</span></li>
+  <li class="list-group-item"><b>Description </b><span class="badge badge-muted float-right text-wrap text-justify">'.$row->description.'</span></li>
   <li class="list-group-item"><b>Stock Quantity</b> <span class="badge badge-danger float-right">'.$row->stock.'</span></li>
   <li class="list-group-item"><b>Data of Receipt </b><span class="badge badge-secondary float-right">'.$row->date_of_receipt.'</span></li>
   <li class="list-group-item"><b>Expiration Date</b> <span class="badge badge-dark float-right">'.$row->expiration_date.'</span></li>

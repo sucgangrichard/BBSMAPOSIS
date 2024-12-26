@@ -215,7 +215,7 @@ echo'
 <td>
 <div class="btn-group">
     <a href="printbill.php?id='.$row->invoice_id.'" class="btn btn-warning " role="button" target="_blank"><span class="fa fa-print" style="color:#ffffff" data-toggle="tooltip" title="Print Bill"></span></a>
-    <a href="edit_dine_in.php?id='.$row->invoice_id.'" class="btn btn-info " role="button" onclick="return checkPassword('.$row->invoice_id.', \'useredit_dine_in.php?id='.$row->invoice_id.'\')"><span class="fa fa-edit" style="color:#ffffff" data-toggle="tooltip" title="Edit Order"></span></a>
+    <a href="edit_dine_in.php?id='.$row->invoice_id.'" class="btn btn-info " role="button" onclick="return checkPassword('.$row->invoice_id.', \'edit_dine_in.php?id='.$row->invoice_id.'\')"><span class="fa fa-edit" style="color:#ffffff" data-toggle="tooltip" title="Edit Order"></span></a>
     <button id='.$row->invoice_id.' class="btn btn-danger  btndelete" onclick="return checkPassword('.$row->invoice_id.', \'delete_order.php?id='.$row->invoice_id.'\')"><span class="fa fa-trash" style="color:#ffffff" data-toggle="tooltip" title="Delete Order"></span></button>
 </div>
 </td>
