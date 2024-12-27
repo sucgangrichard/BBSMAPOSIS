@@ -28,6 +28,7 @@ if (isset($_POST['btn_login'])) {
      
 
       $_SESSION['status']="Login Success By Admin";
+      
       $_SESSION['status_code']="success";
       // Update the login time
       $update = $pdo->prepare("UPDATE tbl_user SET logintime = NOW() WHERE username = :username");
@@ -52,7 +53,7 @@ $_SESSION['role'] = $row['role'];
       $_SESSION['status']="Login Success By User";
       $_SESSION['status_code']="success";
 
-      header('refresh: 3;ui/user_dashboard.php');
+      header('refresh: 3;ui/userdine_in.php');
 
       $_SESSION['user_id']=$row['user_id'];
       $_SESSION['username'] = $row['username'];
@@ -162,19 +163,28 @@ $(function() {
       position: 'top',
       showConfirmButton: false,
       timer: 5000
+     
     });
 
   
       Toast.fire({
         icon: '<?php echo $_SESSION['status_code'];?>',
-        title: '<?php echo $_SESSION['status'];?>'
+        title: '<div style="text-align: center;margin-top:0.6em"><?php echo $_SESSION['status'];?></div>',
+        customClass: {
+            popup: 'small-swal'
+        }
       })
     });
 
 
 
 </script>
-
+<style>
+.small-swal {
+    width: 250px !important;
+    padding: 10px !important;
+}
+</style>
 
 <?php
 unset($_SESSION['status']);

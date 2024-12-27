@@ -176,6 +176,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     // }
 
 
+    
 
       function getLowStockItems($pdo) {
         $sql = "SELECT product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed

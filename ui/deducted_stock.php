@@ -83,7 +83,7 @@ th{background: #eee;}
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Stock Usage Tracker</h1>
+          <!-- <h1 class="m-0">Stock Usage Tracker</h1> -->
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -105,7 +105,7 @@ th{background: #eee;}
 
         <div class="card card-primary card-outline">
             <div class="card-header">
-              
+            <h5 class="m-0">Stock Usage Tracker</h5>
             </div>
             <div class="card-body">
            <div class="col-md-12">
