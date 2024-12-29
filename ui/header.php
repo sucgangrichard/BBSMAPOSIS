@@ -341,6 +341,12 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </a>
             <ul class="nav nav-treeview" style="margin-left: 2em;">
             <li class="nav-item">
+                <a href="stock_registry.php" class="nav-link">
+                  <i class="nav-icon fas fa-plus-square"></i>
+                  <p>Stock Entry Form</p>
+                </a>
+              </li>
+            <li class="nav-item">
                 <a href="add_productwithchart.php" class="nav-link">
                   <i class="nav-icon fas fa-plus"></i>
                   <p>Barcode Entry</p>
@@ -354,17 +360,14 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </a>
               </li>
 
+              
+
+              
+
               <li class="nav-item">
                 <a href="stock_list.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
-                  <p>Registered Product List</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="stock_registry.php" class="nav-link">
-                  <i class="nav-icon fas fa-plus-square"></i>
-                  <p>Stock Registry</p>
+                  <p>Product List</p>
                 </a>
               </li>
 
@@ -412,7 +415,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
           <li class="nav-item">
             <a href="#" class="nav-link">
-              <i class="nav-icon fas fa-pencil"></i>
+              <i class="nav-icon fas fa-utensils"></i>
               <p>
                 Menu
                 <i class="right fas fa-angle-left"></i>
@@ -422,21 +425,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <li class="nav-item">
                 <a href="add_menu.php" class="nav-link">
                   <i class="nav-icon fas fa-plus"></i>
-                  <p>Add Product Menu</p>
+                  <p>Add Menu</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="menu_list1.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
-                  <p>Product Menu List</p>
+                  <p>Menu List</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="menu_category.php" class="nav-link">
                   <i class="nav-icon fa fa-ellipsis-h"></i>
-                  <p>Product Menu Category</p>
+                  <p>Menu Category</p>
                 </a>
               </li>
 

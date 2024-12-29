@@ -71,7 +71,7 @@ if($_SESSION['username']==""  OR $_SESSION['role']=="User"){
             </div>
             <div class="form-group">
               <label for="file">Choose a File/Image</label>
-              <input type="file" name="attachment" class="form-control" id="file" multiple/>
+              <input type="file" name="attachment[]" class="form-control" id="file" multiple/>
             </div>
             <div class="form-group">
               <input type="submit" class="btn btn-primary" value="Send message">
