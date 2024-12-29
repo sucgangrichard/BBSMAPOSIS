@@ -179,7 +179,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
 
       function getLowStockItems($pdo) {
-        $sql = "SELECT product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
+        $sql = "SELECT id,product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
         $result = $pdo->query($sql);
     
         $lowStockItems = [];
@@ -197,7 +197,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
     }
     
     function getLowAvailableItems($pdo) {
-        $sql = "SELECT product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
+        $sql = "SELECT menu_id,product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
         $result = $pdo->query($sql);
     
         $lowAvailableItems = [];
@@ -238,7 +238,10 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <span class="dropdown-header"><?php echo $lowStockCount; ?> Low Stock Notifications</span>
           <div class="dropdown-divider"></div>
           <?php foreach ($notifications as $item): ?>
-        <a href="#" class="dropdown-item">
+            <?php 
+        $link = isset($item['stock']) ? 'stock_list.php?id=' . $item['id'] : 'menu_list1.php?id=' . $item['menu_id'];
+        ?>
+        <a href="<?php echo $link; ?>" class="dropdown-item">
           <i class="fas fa-exclamation-triangle mr-2"></i> 
           <span class="notification-text">
           <?php 
@@ -340,21 +343,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
             <li class="nav-item">
                 <a href="add_productwithchart.php" class="nav-link">
                   <i class="nav-icon fas fa-plus"></i>
-                  <p>Add Stocks Barcoding</p>
+                  <p>Barcode Entry</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="deducted_stock.php" class="nav-link">
                   <i class="nav-icon fas fa-circle-minus"></i>
-                  <p>Stock Usage Monitor</p>
+                  <p>Usage Tracker</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="stock_list.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
-                  <p>Stock List</p>
+                  <p>Registered Product List</p>
                 </a>
               </li>
 

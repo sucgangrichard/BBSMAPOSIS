@@ -122,22 +122,50 @@ while (strtotime($currentDate) <= strtotime($today)) {
   $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
 }
 ?>
+<style>
+  #refresh-timer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    font-size: 14px;
+  }
 
+  @media (max-width: 768px) {
+    #refresh-timer {
+      font-size: 12px;
+      padding: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #refresh-timer {
+      font-size: 10px;
+      padding: 6px;
+    }
+  }
+</style>
 <!-- ChartJS -->
 <script src="../plugins/chart.js/Chart.min.js"></script>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <div class="content-header">
+    
     <div class="container-fluid">
+    
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Admin Dashboard</h1>
+        <div id="refresh-timer" class="d-none d-md-block">Page will refresh in <span id="timer">15</span> seconds</div>
+
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <!-- <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Starter Page</li> -->
+          
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -147,6 +175,7 @@ while (strtotime($currentDate) <= strtotime($today)) {
 
   <!-- Main content -->
   <div class="content">
+    
     <div class="container-fluid">
       <div class="row">
         <div class="col-lg-12">
@@ -471,7 +500,7 @@ foreach ($rows as $row) {
               <h5 class="m-0">AVAILABILITY USAGE FORM</h5>
             </div>
             <div class="card-body">
-
+            <div class="table-responsive">
             <table class="table table-striped table-hover " id="table_recentorder">
                 <thead>
                   <tr>
@@ -507,33 +536,15 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
 <td><span class="badge ' . $badgeClass . '">' . $row->category . '</span></td>
 <td><span class="badge ' . $badgeClass . '">' . $row->available . '</span></td></tr>';
 
-// if($row->payment_type=="Cash"){ <td><a href="edit_dine_in.php?id='. $row->menu_id.'">'.$row->menu_id.'</a></td>
-//   echo'<td><span class="badge badge-warning">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Gcash"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Maya"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Debit/Credit"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else{
-//   echo'<td><span class="badge badge-danger">'.$row->payment_type.'</td></span></td>';
-
-// }
-
-
-
-
                   }
                   ?>
                   </tbody>
                  </table>
 
             
-
-            </div></div>
+                 </div>
+            </div>
+          </div>
 
             
 
@@ -701,6 +712,21 @@ include_once "footer.php";
       "order": [[2, "desc"]] // Order by the third column (QTY) in descending order
     });
   });
+
+  //  // Auto-refresh the page every 5 seconds (5000 milliseconds)
+  var refreshInterval = 15000;
+  var timer = refreshInterval / 1000;
+  setInterval(function() {
+    location.reload();
+  }, refreshInterval);
+
+  // // Update the countdown timer every second
+  setInterval(function() {
+    if (timer > 0) {
+      timer--;
+      document.getElementById('timer').textContent = timer;
+    }
+  }, 1000);
 </script>
 
 

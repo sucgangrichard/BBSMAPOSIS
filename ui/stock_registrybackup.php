@@ -2,7 +2,6 @@
 
 
 include_once 'conndb.php';
-ob_start(); // Start output buffering
 session_start();
 
 
@@ -23,27 +22,17 @@ if($_SESSION['username']==""  OR $_SESSION['role']=="User"){
 
 if(isset($_POST['btnsave'])){
 
-  $barcode       =$_POST['txtbarcode'];
-  $product_name  =$_POST['txtproduct_name'];
-  $stock         =$_POST['txtstock'];
-  $category      =$_POST['txtselect_option'];
-  $expiration_date = date('Y-m-d',strtotime($_POST['date_1']));
-  $date_of_receipt = date('Y-m-d',strtotime($_POST['date_2']));
-  $received_by   =$_POST['txtreceived_by'];
-  $packaging_type =$_POST['txtpackaging_type'];
-  $description   =$_POST['txtdescription'];
-  
-  // Check if barcode already exists
-  $select = $pdo->prepare("SELECT * FROM tbl_product WHERE barcode = :barcode");
-  $select->bindParam(':barcode', $barcode);
-  $select->execute();
-  
-  if($select->rowCount() > 0) {
-    $_SESSION['status'] = "Barcode already exists!";
-    $_SESSION['status_code'] = "error";
-    header('location: stock_registry.php');
-    exit();
-  }
+    $barcode       =$_POST['txtbarcode'];
+    $product_name       =$_POST['txtproduct_name'];
+    $stock         =$_POST['txtstock'];
+    $category      =$_POST['txtselect_option'];
+    $expiration_date     = date('Y-m-d',strtotime($_POST['date_1']));
+    $date_of_receipt     = date('Y-m-d',strtotime($_POST['date_2']));
+    $received_by   =$_POST['txtreceived_by'];
+    // $condition_at_receipt   =$_POST['txtcondition_at_receipt'];
+    $packaging_type   =$_POST['txtpackaging_type'];
+    $description   =$_POST['txtdescription'];
+    
 
 //Image Code or File Code Start Here..
 $f_name        =$_FILES['myfile']['name'];
@@ -54,47 +43,131 @@ $f_extension   =strtolower(end($f_extension));
 $f_newfile     =uniqid().'.'. $f_extension;   
   
 $store = "productimages/".$f_newfile;
-  
-if($f_extension=='jpg' || $f_extension=='jpeg' || $f_extension=='png' || $f_extension=='gif'){
+    
+if($f_extension=='jpg' || $f_extension=='jpeg' ||   $f_extension=='png' || $f_extension=='gif'){
  
   if($f_size>=1000000 ){
-    
+        
+ 
+
+
   $_SESSION['status']="Max file should be 1MB";
   $_SESSION['status_code']="warning";
-    
+        
   }else{
-    
+      
   if(move_uploaded_file($f_tmp,$store)){
 
 $product_image=$f_newfile;
 
-$insert=$pdo->prepare("insert into tbl_product ( barcode,product_name,stock,category,description,expiration_date, date_of_receipt,received_by,packaging_type,product_image) 
-values(:barcode,:product_name,:stock,:category,:description,:expiration_date, :date_of_receipt,:received_by,:packaging_type,:product_image)");
 
-$insert->bindParam(':barcode',$barcode);
-$insert->bindParam(':product_name',$product_name);
-$insert->bindParam(':stock',$stock);
-$insert->bindParam(':category',$category);
-$insert->bindParam(':description',$description);
-$insert->bindParam(':expiration_date',$expiration_date);
-$insert->bindParam(':date_of_receipt',$date_of_receipt);
-$insert->bindParam(':received_by',$received_by);
-$insert->bindParam(':packaging_type',$packaging_type);
-$insert->bindParam(':product_image',$product_image);
+if(empty($barcode)){
 
-if($insert->execute()){
+
+  $insert=$pdo->prepare("insert into tbl_product ( barcode,product_name,stock,category,description,expiration_date, date_of_receipt,received_by,packaging_type,product_image) 
+  values(:barcode,:product_name,:stock,:category,:description,:expiration_date, :date_of_receipt,:received_by,:packaging_type,:product_image)");
+  
+
+
+
+ // $insert->bindParam(':barcode',$barcode);
+
+  $insert->bindParam(':barcode',$barcode);
+  $insert->bindParam(':product_name',$product_name);
+  $insert->bindParam(':stock',$stock);
+  $insert->bindParam(':category',$category);
+  $insert->bindParam(':description',$description);
+  $insert->bindParam(':expiration_date',$expiration_date);
+  $insert->bindParam(':date_of_receipt',$date_of_receipt);
+  $insert->bindParam(':received_by',$received_by);
+  // $insert->bindParam(':condition_at_receipt',$saleprice);
+  $insert->bindParam(':packaging_type',$packaging_type);
+  $insert->bindParam(':product_image',$product_image);
+  
+  $insert->execute();
+
+  $product_id=$pdo->lastInsertId(); // which was the 5
+
+
+
+  
+
+
+
+  date_default_timezone_set("Asia/Calcutta");
+$newbarcode=$pid.date('his');
+
+$update=$pdo->prepare("update tbl_product SET barcode='$newbarcode' where product_id='".$product_id."'");
+
+if($update->execute()){
+
+
   $_SESSION['status']="Product Inserted Successfully";
   $_SESSION['status_code']="success";
 }else{
   $_SESSION['status']="Product Inserted Failed";
   $_SESSION['status_code']="error";
+
 }
 
+
+
+
+ 
+
+
+}else{
+
+
+
+
+    $insert=$pdo->prepare("insert into tbl_product ( barcode,product_name,stock,category,description,expiration_date, date_of_receipt,received_by,packaging_type,product_image) 
+    values(:barcode,:product_name,:stock,:category,:description,:expiration_date, :date_of_receipt,:received_by,:packaging_type,:product_image)");
+    
+    $insert->bindParam(':barcode',$barcode);
+    $insert->bindParam(':product_name',$product_name);
+    $insert->bindParam(':stock',$stock);
+    $insert->bindParam(':category',$category);
+    $insert->bindParam(':description',$description);
+    $insert->bindParam(':expiration_date',$expiration_date);
+    $insert->bindParam(':date_of_receipt',$date_of_receipt);
+    $insert->bindParam(':received_by',$received_by);
+    // $insert->bindParam(':condition_at_receipt',$saleprice);
+    $insert->bindParam(':packaging_type',$packaging_type);
+$insert->bindParam(':product_image',$product_image);
+
+if($insert->execute()){
+
+  $_SESSION['status']="Product Inserted Successfully";
+  $_SESSION['status_code']="success";
+}else{
+  $_SESSION['status']="Product Inserted Failed";
+  $_SESSION['status_code']="error";
+
+}
+
+
+
+}
+
+
+
+
+
+           
+  
+           
   } 
+        
   }   
-  }else{
-    $_SESSION['status']="only jpg, jpeg, png and gif can be upload";
-    $_SESSION['status_code']="warning";
+        
+  }else
+{
+     
+
+      $_SESSION['status']="only jpg, jpeg, png and gif can be upload";
+      $_SESSION['status_code']="warning";
+
 } 
 }
 
@@ -202,7 +275,7 @@ extract($row);
 
                       <div class="form-group">
                     <label>Description</label>
-                    <textarea class="form-control" placeholder="Enter Description" name="txtdescription" rows="4"></textarea>
+                    <textarea class="form-control" placeholder="Enter Description" name="txtdescription" rows="4" required></textarea>
                   </div>
 
 
@@ -247,7 +320,7 @@ extract($row);
 
     <div class="form-group">
                     <label >Product image</label>
-                    <input type="file" class="input-group"  name="myfile">
+                    <input type="file" class="input-group"  name="myfile" required>
                     <p>Upload image</p>
                   </div>
 
