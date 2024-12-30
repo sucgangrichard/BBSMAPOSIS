@@ -48,7 +48,7 @@ if($_SESSION['username']==""  OR $_SESSION['role']=="Admin"){
 
           <div class="card card-primary card-outline">
             <div class="card-header">
-              <h5 class="m-0">Stock List :</h5>
+              <h5 class="m-0">Product List</h5>
             </div>
             <div class="card-body">
             <div class="table-responsive">

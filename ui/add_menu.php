@@ -165,7 +165,7 @@ if($insert->execute()){
 {
      
   
-      $_SESSION['status']="only jpg, jpeg, png and gif can be upload";
+      $_SESSION['status']="Invalid File Format";
       $_SESSION['status_code']="warning";
 
 } 
@@ -298,6 +298,7 @@ extract($row);
 
     <div class="form-group">
      <label >Received Date</label>
+     <!-- <input type="text" class="form-control" name="date_1" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" required> -->
      <div class="input-group date" id="date_1" data-target-input="nearest">
                         <input type="text" class="form-control date_1" data-target="#date_1" name="date_1"  placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}"  required/>
                         <div class="input-group-append" data-target="#date_1" data-toggle="datetimepicker">

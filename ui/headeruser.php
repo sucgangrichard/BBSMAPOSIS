@@ -177,85 +177,89 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 
 
-      function getLowStockItems($pdo) {
-        $sql = "SELECT product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
-        $result = $pdo->query($sql);
-    
-        $lowStockItems = [];
-        if ($result->rowCount() > 0) {
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $lowStockItems[] = $row;
-            }
-        }
-        if (!empty($lowStockItems)) {
-          echo '<script type="text/javascript">',
-               'playNotificationSound();',
-               '</script>';
+      
+    function getLowStockItems($pdo) {
+      $sql = "SELECT id,product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
+      $result = $pdo->query($sql);
+  
+      $lowStockItems = [];
+      if ($result->rowCount() > 0) {
+          while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+              $lowStockItems[] = $row;
+          }
       }
-        return $lowStockItems;
+      if (!empty($lowStockItems)) {
+        echo '<script type="text/javascript">',
+             'playNotificationSound();',
+             '</script>';
     }
-    
-    function getLowAvailableItems($pdo) {
-        $sql = "SELECT product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
-        $result = $pdo->query($sql);
-    
-        $lowAvailableItems = [];
-        if ($result->rowCount() > 0) {
-            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-                $lowAvailableItems[] = $row;
-            }
-        }
+      return $lowStockItems;
+  }
+  
+  function getLowAvailableItems($pdo) {
+      $sql = "SELECT menu_id,product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
+      $result = $pdo->query($sql);
+  
+      $lowAvailableItems = [];
+      if ($result->rowCount() > 0) {
+          while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+              $lowAvailableItems[] = $row;
+          }
+      }
 
-        if (!empty($lowAvailableItems)) {
-          echo '<script type="text/javascript">',
-               'playNotificationSound();',
-               '</script>';
-      }
-    
-        return $lowAvailableItems;
+      if (!empty($lowAvailableItems)) {
+        echo '<script type="text/javascript">',
+             'playNotificationSound();',
+             '</script>';
     }
-    
-    $lowStockItems = getLowStockItems($pdo);
-    $lowAvailableItems = getLowAvailableItems($pdo);
-    
-    $notifications = array_merge($lowStockItems, $lowAvailableItems);
-    $lowStockCount = count($notifications);
-    ?> 
+  
+      return $lowAvailableItems;
+  }
+  
+  $lowStockItems = getLowStockItems($pdo);
+  $lowAvailableItems = getLowAvailableItems($pdo);
+  
+  $notifications = array_merge($lowStockItems, $lowAvailableItems);
+  $lowStockCount = count($notifications);
+  ?> 
 <style>
 .notification-text {
-  display: inline-block;
-  max-width: calc(100% - 50px); /* Adjust based on icon and padding */
-  white-space: normal;
+display: inline-block;
+max-width: calc(100% - 50px); /* Adjust based on icon and padding */
+white-space: normal;
 }
 </style>
-      <li class="nav-item dropdown">
-        <a class="nav-link" data-toggle="dropdown" href="#">
-          <i class="far fa-bell"></i>
-          <span class="badge badge-warning navbar-badge"><?php echo $lowStockCount; ?></span>
-        </a>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-          <span class="dropdown-header"><?php echo $lowStockCount; ?> Low Stock Notifications</span>
-          <div class="dropdown-divider"></div>
-          <?php foreach ($notifications as $item): ?>
-        <a href="#" class="dropdown-item">
-          <i class="fas fa-exclamation-triangle mr-2"></i> 
-          <span class="notification-text">
+    <li class="nav-item dropdown">
+      <a class="nav-link" data-toggle="dropdown" href="#">
+        <i class="far fa-bell"></i>
+        <span class="badge badge-warning navbar-badge"><?php echo $lowStockCount; ?></span>
+      </a>
+      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+        <span class="dropdown-header"><?php echo $lowStockCount; ?> Low Stock Notifications</span>
+        <div class="dropdown-divider"></div>
+        <?php foreach ($notifications as $item): ?>
           <?php 
-        if (isset($item['stock'])) {
-            echo htmlspecialchars($item['product_name']) . '  is low on stock.';
-        } else {
-            echo htmlspecialchars($item['product_name']) . '  is low on avail.qty#.';
-        }
-        ?>
-          </span>
-          <span class="float-right text-muted text-sm">
-          <?php 
-        if (isset($item['stock'])) {
-            echo $item['stock'] . ' left on stock for inventory';
-        } else {
-            echo $item['available'] . ' left on avail.qty# for menu order';
-        }
-        ?>
+      $link = isset($item['stock']) ? 'user_stock_list.php?id=' . $item['id'] : 'user_menu_list2.php?id=' . $item['menu_id'];
+      ?>
+      <a href="<?php echo $link; ?>" class="dropdown-item">
+        <i class="fas fa-exclamation-triangle mr-2"></i> 
+        <span class="notification-text">
+        <?php 
+      if (isset($item['stock'])) {
+          echo htmlspecialchars($item['product_name']) . '  is low on stock.';
+      } else {
+          echo htmlspecialchars($item['product_name']) . '  is low on avail.qty#.';
+      }
+      ?>
+        </span>
+        <span class="float-right text-muted text-sm">
+        <?php 
+      if (isset($item['stock'])) {
+          echo $item['stock'] . ' left on stock for inventory';
+      } else {
+          echo $item['available'] . ' left on avail.qty# for menu order';
+      }
+      ?>
                 </span>
             </a>
         <div class="dropdown-divider"></div>
@@ -348,28 +352,35 @@ scratch. This page gets rid of all links and provides the needed markup only.
               <li class="nav-item">
                 <a href="stock_registry1.php" class="nav-link">
                   <i class="nav-icon fas fa-plus-square"></i>
-                  <p>Stock Registry</p>
+                  <p>Stock Entry Form</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="user_deducted_stock.php" class="nav-link">
                   <i class="nav-icon fas fa-circle-minus"></i>
-                  <p>Stock Usage Monitor</p>
+                  <p>Usage Tracker</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="user_add_product.php" class="nav-link">
                   <i class="nav-icon fas fa-circle-plus"></i>
-                  <p>Add Stocks Barcoding</p>
+                  <p>Barcode Entry</p>
                 </a>
               </li>
 
               <li class="nav-item">
                 <a href="user_stock_list.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
-                  <p>Stock List</p>
+                  <p>Product List</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="user_menu_list2.php" class="nav-link">
+                  <i class="nav-icon fas fa-list"></i>
+                  <p>Menu List</p>
                 </a>
               </li>
 
