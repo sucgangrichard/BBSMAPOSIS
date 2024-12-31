@@ -58,7 +58,7 @@ if($_SESSION['username']==""  OR $_SESSION['role']=="User"){
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <!-- <h1 class="m-0">BackUp Data</h1> -->
+          <h1 class="m-0">BackUp Data</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -150,7 +150,7 @@ function startBackup() {
                 if (response.completed) {
                     swal.fire({
                         title: 'Backup Completed',
-                        text: 'The backup saved at your C:\BackupData.',
+                        text: 'The backup process has been completed successfully.',
                         icon: 'success',
                         confirmButtonText: 'OK'
                     }).then(() => {

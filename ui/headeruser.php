@@ -79,7 +79,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <li class="nav-item">
             <a class="nav-link">
                 <i class="nav-icon fas fa-clock"></i>
-                <strong>Current Time: <span id="current-time"></strong></span>
+                <strong><span id="current-time"></strong></span>
             </a>
         </li>
 

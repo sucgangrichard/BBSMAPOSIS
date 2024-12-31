@@ -40,7 +40,7 @@ if($_SESSION['username']==""  OR $_SESSION['role']=="Admin"){
     if($select->rowCount() > 0) {
       $_SESSION['status'] = "Barcode already exists!";
       $_SESSION['status_code'] = "error";
-      header('location: stock_registry.php');
+      header('location: stock_registry1.php');
       exit();
     }
   
