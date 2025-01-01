@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <?php
-
+include_once 'emailnotif.php';
 // session_start();
 date_default_timezone_set("Asia/Manila");
 if (!isset($_SESSION['login_time'])) {
     $_SESSION['login_time'] = date("Y-m-d H:i:s");
 }
+
+
 ?>
 
 
@@ -145,7 +147,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <?php
       
       include_once 'conndb.php';
-
+// Check stock levels and send email notifications if necessary
+checkStockLevels($pdo);
     //   function sendSMS($message, $to) {
     //     $api_key = 'your_semaphore_api_key';
     //     $url = 'https://api.semaphore.co/api/v4/messages';
@@ -221,7 +224,11 @@ scratch. This page gets rid of all links and provides the needed markup only.
     
     $notifications = array_merge($lowStockItems, $lowAvailableItems);
     $lowStockCount = count($notifications);
+
+    
     ?> 
+
+    
 <style>
 .notification-text {
   display: inline-block;
