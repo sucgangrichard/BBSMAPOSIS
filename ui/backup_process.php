@@ -44,6 +44,10 @@ if ($_POST['action'] == 'backup') {
 
             // Save the SQL script to a backup file
     $backupDir = './backupdata/'; // Ensure the directory path ends with a slash
+    $backupDir = 'C:/backupdata/'; // Ensure the directory path ends with a slash
+    if (!is_dir($backupDir)) {
+        mkdir($backupDir, 0777, true);
+    }
     $backupFile = $backupDir . 'backup_' . date('Y-m-d_H-i-s') . '.sql';
     $fileHandler = fopen($backupFile, 'a');
     fwrite($fileHandler, $sqlScript);

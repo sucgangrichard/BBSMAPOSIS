@@ -114,6 +114,17 @@ function getEarnings($date, $pdo) {
   $row = $stmt->fetch(PDO::FETCH_ASSOC);
   return $row ? $row['earnings'] : 0;
 }
+// Determine which month to display based on a query parameter
+$month = isset($_GET['month']) ? $_GET['month'] : 'current';
+
+// Calculate the start and end dates based on the selected month
+if ($month === 'previous') {
+    $firstOfMonth = date("Y-m-01", strtotime("first day of previous month"));
+    $lastOfMonth = date("Y-m-t", strtotime("last day of previous month"));
+} else {
+    $firstOfMonth = date("Y-m-01");
+    $lastOfMonth = date("Y-m-t");
+}
 
 $earningsData = [];
 $currentDate = $firstOfMonth;
@@ -122,22 +133,50 @@ while (strtotime($currentDate) <= strtotime($today)) {
   $currentDate = date('Y-m-d', strtotime($currentDate . ' +1 day'));
 }
 ?>
+<style>
+  #refresh-timer {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    font-size: 14px;
+  }
 
+  @media (max-width: 768px) {
+    #refresh-timer {
+      font-size: 12px;
+      padding: 8px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    #refresh-timer {
+      font-size: 10px;
+      padding: 6px;
+    }
+  }
+</style>
 <!-- ChartJS -->
 <script src="../plugins/chart.js/Chart.min.js"></script>
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
   <!-- Content Header (Page header) -->
   <div class="content-header">
+    
     <div class="container-fluid">
+    
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Admin Dashboard</h1>
+        <div id="refresh-timer" class="d-none d-md-block">Page will refresh in <span id="timer">15</span> seconds</div>
+
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
-            <!-- <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Starter Page</li> -->
+          
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -147,6 +186,7 @@ while (strtotime($currentDate) <= strtotime($today)) {
 
   <!-- Main content -->
   <div class="content">
+    
     <div class="container-fluid">
       <div class="row">
         <div class="col-lg-12">
@@ -226,7 +266,7 @@ while (strtotime($currentDate) <= strtotime($today)) {
 
 
 
-        <div class="card card-primary card-outline">
+        <div class="card card-dark card-outline">
             <div class="card-header">
               <h5 class="m-0">Earning By Date</h5>
             </div>
@@ -271,6 +311,9 @@ $date[] = $order_date; // Add order_date to the date array
 
 
             <div >
+            <a href="?month=current">Current Month</a>
+<a href="?month=previous">Previous Month</a>
+
   <canvas id="myChart" style="height: 250px"></canvas>
 </div>
 
@@ -280,81 +323,77 @@ $date[] = $order_date; // Add order_date to the date array
             </div>
 
             <script>
-          var earningsData = {
-      labels: [<?php echo implode(',', array_map(function($date) { return "'$date'"; }, array_keys($earningsData))); ?>],
-      datasets: [{
-        label: 'Lowest',
-        data: [<?php echo implode(',', $earningsData); ?>],
-        backgroundColor: (function() {
+            var earningsData = {
+          labels: [<?php echo implode(',', array_map(function($date) { return "'$date'"; }, array_keys($earningsData))); ?>],
+          datasets: [{
+          label: 'Earnings',
+          data: [<?php echo implode(',', $earningsData); ?>],
+          backgroundColor: (function() {
             var data = [<?php echo implode(',', $earningsData); ?>];
             var max = Math.max.apply(null, data);
             var secondMax = Math.max.apply(null, data.filter(function(value) { return value !== max; }));
             var thirdMax = Math.max.apply(null, data.filter(function(value) { return value !== max && value !== secondMax; }));
             var min = Math.min.apply(null, data);
             return data.map(function(value) {
-                if (value === max) {
-                    return 'rgba(255, 0, 0, 0.2)';
-                } else if (value === secondMax) {
-                    return 'rgba(255, 165, 0, 0.2)';
-                } else if (value === thirdMax) {
-                    return 'rgba(21, 255, 0, 0.2)';
-                } else if (value === min) {
-                    return 'rgba(0, 0, 255, 0.2)';
-                } else {
-                    return 'rgba(75, 192, 192, 0.2)';
-                }
+              if (value === max) {
+                return 'rgba(255, 0, 0, 0.2)';
+              } else if (value === thirdMax) {
+                return 'rgba(21, 255, 0, 0.2)';
+              } else if (value === min) {
+                return 'rgba(128, 0, 128, 0.2)';
+              } else {
+                return 'rgba(75, 192, 192, 0.2)';
+              }
             });
-        })(),
-        borderColor: (function() {
+          })(),
+          borderColor: (function() {
             var data = [<?php echo implode(',', $earningsData); ?>];
             var max = Math.max.apply(null, data);
             var secondMax = Math.max.apply(null, data.filter(function(value) { return value !== max; }));
             var thirdMax = Math.max.apply(null, data.filter(function(value) { return value !== max && value !== secondMax; }));
             var min = Math.min.apply(null, data);
             return data.map(function(value) {
-                if (value === max) {
-                    return 'rgba(255, 0, 0, 1)';
-                } else if (value === secondMax) {
-                    return 'rgba(255, 165, 0, 1)';
-                } else if (value === thirdMax) {
-                    return 'rgb(41, 145, 0)';
-                } else if (value === min) {
-                    return 'rgba(0, 0, 255, 1)';
-                } else {
-                    return 'rgba(75, 192, 192, 1)';
-                }
+              if (value === max) {
+                return 'rgba(255, 0, 0, 1)';
+              } else if (value === thirdMax) {
+                return 'rgb(41, 145, 0)';
+              } else if (value === min) {
+                return 'rgba(128, 0, 128, 1)';
+              } else {
+                return 'rgba(75, 192, 192, 1)';
+              }
             });
-        })(),
-        borderWidth: (function() {
+          })(),
+          borderWidth: (function() {
             var data = [<?php echo implode(',', $earningsData); ?>];
             var max = Math.max.apply(null, data);
             var secondMax = Math.max.apply(null, data.filter(function(value) { return value !== max; }));
             var thirdMax = Math.max.apply(null, data.filter(function(value) { return value !== max && value !== secondMax; }));
             var min = Math.min.apply(null, data);
             return data.map(function(value) {
-                if (value === max || value === secondMax || value === thirdMax || value === min) {
-                    return 2;
-                } else {
-                    return 1;
-                }
+              if (value === max || value === thirdMax || value === min) {
+                return 2;
+              } else {
+                return 1;
+              }
             });
-        })()
-    },
-    {
-        label: 'Highest',
-        // data: [<?php echo implode(',', array_map(function($value) use ($earningsData) { return $value === max($earningsData) ? $value : 'null'; }, $earningsData)); ?>],
-        backgroundColor: 'rgba(255, 0, 0, 0.2)',
-        borderColor: 'rgba(255, 0, 0, 1)',
-        borderWidth: 1
-    // },
-    // {
-    //     label: 'Lowest',
-    //     // data: [<?php echo implode(',', array_map(function($value) use ($earningsData) { return $value === min($earningsData) ? $value : 'null'; }, $earningsData)); ?>],
-    //     backgroundColor: 'rgba(0, 0, 255, 0.2)',
-    //     borderColor: 'rgba(0, 0, 255, 1)',
-    //     borderWidth: 1
-    }]
-  };
+          })()
+        },
+        {
+          label: 'Highest',
+          data: [<?php echo implode(',', array_map(function($value) use ($earningsData) { return $value === max($earningsData) ? $value : 'null'; }, $earningsData)); ?>],
+          backgroundColor: 'rgba(255, 0, 0, 0.2)',
+          borderColor: 'rgba(255, 0, 0, 1)',
+          borderWidth: 1
+        },
+        {
+          label: 'Lowest',
+  data: [<?php echo implode(',', array_map(function($value) use ($earningsData) { return $value === min($earningsData) ? $value : 'null'; }, $earningsData)); ?>],
+  backgroundColor: 'rgba(128, 0, 128, 0.2)',
+  borderColor: 'rgba(128, 0, 128, 1)',
+  borderWidth: 1
+        }]
+        };
 
   var ctx = document.getElementById('myChart').getContext('2d');
   var myChart = new Chart(ctx, {
@@ -405,7 +444,7 @@ $date[] = $order_date; // Add order_date to the date array
 
 <div class="col-md-6">
   
-<div class="card card-primary card-outline">
+<div class="card card-dark card-outline">
             <div class="card-header">
               <h5 class="m-0">BEST SELLING PRODUCT</h5>
             </div>
@@ -442,7 +481,7 @@ $maxTotal = max(array_column($rows, 'total'));
 
 // Iterate through the rows and apply the green badge class to the product with the highest total quantity
 foreach ($rows as $row) {
-    $badgeClass = $row->total == $maxTotal ? 'badge-success' : 'badge-dark';
+    $badgeClass = $row->total == $maxTotal ? 'badge-success' : 'badge-muted';
 
     echo '
 <tr>
@@ -466,12 +505,12 @@ foreach ($rows as $row) {
 
 <div class="col-md-6">
   
-<div class="card card-primary card-outline">
+<div class="card card-dark card-outline">
             <div class="card-header">
               <h5 class="m-0">AVAILABILITY USAGE FORM</h5>
             </div>
             <div class="card-body">
-
+            <div class="table-responsive">
             <table class="table table-striped table-hover " id="table_recentorder">
                 <thead>
                   <tr>
@@ -499,7 +538,7 @@ $select = $pdo->prepare("select product_name, category, available from tbl_mmenu
 $select->execute();
 
 while ($row = $select->fetch(PDO::FETCH_OBJ)) {
-    $badgeClass = $row->available < 10 ? 'badge-danger' : 'badge-dark';
+    $badgeClass = $row->available < 10 ? 'badge-danger' : 'badge-muted';
   
     echo '
   <tr>
@@ -507,33 +546,15 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
 <td><span class="badge ' . $badgeClass . '">' . $row->category . '</span></td>
 <td><span class="badge ' . $badgeClass . '">' . $row->available . '</span></td></tr>';
 
-// if($row->payment_type=="Cash"){ <td><a href="edit_dine_in.php?id='. $row->menu_id.'">'.$row->menu_id.'</a></td>
-//   echo'<td><span class="badge badge-warning">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Gcash"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Maya"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else if($row->payment_type=="Debit/Credit"){
-
-//   echo'<td><span class="badge badge-success">'.$row->payment_type.'</td></span></td>';
-// }else{
-//   echo'<td><span class="badge badge-danger">'.$row->payment_type.'</td></span></td>';
-
-// }
-
-
-
-
                   }
                   ?>
                   </tbody>
                  </table>
 
             
-
-            </div></div>
+                 </div>
+            </div>
+          </div>
 
             
 
@@ -543,7 +564,7 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
 
 <div class="row">
     <div class="col-md-6">
-    <div class="card card-info card-outline">
+    <div class="card card-dark card-outline">
               <div class="card-header">
                 <h3 class="card-title ">STOCK USAGE CHART
                 </h3>
@@ -565,7 +586,7 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
     </div>
 
     <div class="col-md-6">
-    <div class="card card-info card-outline">
+    <div class="card card-dark card-outline">
               <div class="card-header">
                 <h3 class="card-title">AVAILABILITY USAGE CHART</h3>
 
@@ -588,7 +609,7 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
 
     <div class="col-md-12">
   
-<div class="card card-primary card-outline">
+<div class="card card-dark card-outline">
             <div class="card-header">
               <h5 class="m-0">Stock Usage Form</h5>
             </div>
@@ -626,11 +647,11 @@ while ($row = $select->fetch(PDO::FETCH_OBJ)) {
                 // Iterate through the rows and apply the appropriate badge class
                 foreach ($rows as $row) {
                     if ($row->stock == $maxStock) {
-                        $badgeClass = 'badge-success';
+                        $badgeClass = 'badge-muted';
                     } elseif ($row->stock < 10) {
                         $badgeClass = 'badge-danger';
                     } else {
-                        $badgeClass = 'badge-dark';
+                        $badgeClass = 'badge-muted';
                     }
 
                     echo '
@@ -701,6 +722,21 @@ include_once "footer.php";
       "order": [[2, "desc"]] // Order by the third column (QTY) in descending order
     });
   });
+
+  //  // Auto-refresh the page every 5 seconds (5000 milliseconds)
+  var refreshInterval = 15000;
+  var timer = refreshInterval / 1000;
+  setInterval(function() {
+    location.reload();
+  }, refreshInterval);
+
+  // // Update the countdown timer every second
+  setInterval(function() {
+    if (timer > 0) {
+      timer--;
+      document.getElementById('timer').textContent = timer;
+    }
+  }, 1000);
 </script>
 
 

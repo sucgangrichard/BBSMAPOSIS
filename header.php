@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <?php
-
+include_once 'emailnotif.php';
 // session_start();
 date_default_timezone_set("Asia/Manila");
 if (!isset($_SESSION['login_time'])) {
     $_SESSION['login_time'] = date("Y-m-d H:i:s");
 }
+
+
 ?>
 
 
@@ -145,7 +147,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
       <?php
       
       include_once 'conndb.php';
-
+// Check stock levels and send email notifications if necessary
+checkStockLevels($pdo);
     //   function sendSMS($message, $to) {
     //     $api_key = 'your_semaphore_api_key';
     //     $url = 'https://api.semaphore.co/api/v4/messages';
@@ -176,90 +179,94 @@ scratch. This page gets rid of all links and provides the needed markup only.
     // }
 
 
+    
 
-      
-    function getLowStockItems($pdo) {
-      $sql = "SELECT id,product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
-      $result = $pdo->query($sql);
-  
-      $lowStockItems = [];
-      if ($result->rowCount() > 0) {
-          while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-              $lowStockItems[] = $row;
-          }
+      function getLowStockItems($pdo) {
+        $sql = "SELECT id,product_name, stock FROM tbl_product WHERE stock < 10"; // Adjust the threshold as needed
+        $result = $pdo->query($sql);
+    
+        $lowStockItems = [];
+        if ($result->rowCount() > 0) {
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $lowStockItems[] = $row;
+            }
+        }
+        if (!empty($lowStockItems)) {
+          echo '<script type="text/javascript">',
+               'playNotificationSound();',
+               '</script>';
       }
-      if (!empty($lowStockItems)) {
-        echo '<script type="text/javascript">',
-             'playNotificationSound();',
-             '</script>';
+        return $lowStockItems;
     }
-      return $lowStockItems;
-  }
-  
-  function getLowAvailableItems($pdo) {
-      $sql = "SELECT menu_id,product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
-      $result = $pdo->query($sql);
-  
-      $lowAvailableItems = [];
-      if ($result->rowCount() > 0) {
-          while($row = $result->fetch(PDO::FETCH_ASSOC)) {
-              $lowAvailableItems[] = $row;
-          }
-      }
+    
+    function getLowAvailableItems($pdo) {
+        $sql = "SELECT menu_id,product_name, available FROM tbl_mmenu WHERE available < 10"; // Adjust the threshold as needed
+        $result = $pdo->query($sql);
+    
+        $lowAvailableItems = [];
+        if ($result->rowCount() > 0) {
+            while($row = $result->fetch(PDO::FETCH_ASSOC)) {
+                $lowAvailableItems[] = $row;
+            }
+        }
 
-      if (!empty($lowAvailableItems)) {
-        echo '<script type="text/javascript">',
-             'playNotificationSound();',
-             '</script>';
+        if (!empty($lowAvailableItems)) {
+          echo '<script type="text/javascript">',
+               'playNotificationSound();',
+               '</script>';
+      }
+    
+        return $lowAvailableItems;
     }
-  
-      return $lowAvailableItems;
-  }
-  
-  $lowStockItems = getLowStockItems($pdo);
-  $lowAvailableItems = getLowAvailableItems($pdo);
-  
-  $notifications = array_merge($lowStockItems, $lowAvailableItems);
-  $lowStockCount = count($notifications);
-  ?> 
+    
+    $lowStockItems = getLowStockItems($pdo);
+    $lowAvailableItems = getLowAvailableItems($pdo);
+    
+    $notifications = array_merge($lowStockItems, $lowAvailableItems);
+    $lowStockCount = count($notifications);
+
+    
+    ?> 
+
+    
 <style>
 .notification-text {
-display: inline-block;
-max-width: calc(100% - 50px); /* Adjust based on icon and padding */
-white-space: normal;
+  display: inline-block;
+  max-width: calc(100% - 50px); /* Adjust based on icon and padding */
+  white-space: normal;
 }
 </style>
-    <li class="nav-item dropdown">
-      <a class="nav-link" data-toggle="dropdown" href="#">
-        <i class="far fa-bell"></i>
-        <span class="badge badge-warning navbar-badge"><?php echo $lowStockCount; ?></span>
-      </a>
-      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
-        <span class="dropdown-header"><?php echo $lowStockCount; ?> Low Stock Notifications</span>
-        <div class="dropdown-divider"></div>
-        <?php foreach ($notifications as $item): ?>
+      <li class="nav-item dropdown">
+        <a class="nav-link" data-toggle="dropdown" href="#">
+          <i class="far fa-bell"></i>
+          <span class="badge badge-warning navbar-badge"><?php echo $lowStockCount; ?></span>
+        </a>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-right">
+          <span class="dropdown-header"><?php echo $lowStockCount; ?> Low Stock Notifications</span>
+          <div class="dropdown-divider"></div>
+          <?php foreach ($notifications as $item): ?>
+            <?php 
+        $link = isset($item['stock']) ? 'stock_list.php?id=' . $item['id'] : 'menu_list1.php?id=' . $item['menu_id'];
+        ?>
+        <a href="<?php echo $link; ?>" class="dropdown-item">
+          <i class="fas fa-exclamation-triangle mr-2"></i> 
+          <span class="notification-text">
           <?php 
-      $link = isset($item['stock']) ? 'user_stock_list.php?id=' . $item['id'] : 'user_menu_list2.php?id=' . $item['menu_id'];
-      ?>
-      <a href="<?php echo $link; ?>" class="dropdown-item">
-        <i class="fas fa-exclamation-triangle mr-2"></i> 
-        <span class="notification-text">
-        <?php 
-      if (isset($item['stock'])) {
-          echo htmlspecialchars($item['product_name']) . '  is low on stock.';
-      } else {
-          echo htmlspecialchars($item['product_name']) . '  is low on avail.qty#.';
-      }
-      ?>
-        </span>
-        <span class="float-right text-muted text-sm">
-        <?php 
-      if (isset($item['stock'])) {
-          echo $item['stock'] . ' left on stock for inventory';
-      } else {
-          echo $item['available'] . ' left on avail.qty# for menu order';
-      }
-      ?>
+        if (isset($item['stock'])) {
+            echo htmlspecialchars($item['product_name']) . '  is low on stock.';
+        } else {
+            echo htmlspecialchars($item['product_name']) . '  is low on avail.qty#.';
+        }
+        ?>
+          </span>
+          <span class="float-right text-muted text-sm">
+          <?php 
+        if (isset($item['stock'])) {
+            echo $item['stock'] . ' left on stock for inventory';
+        } else {
+            echo $item['available'] . ' left on avail.qty# for menu order';
+        }
+        ?>
                 </span>
             </a>
         <div class="dropdown-divider"></div>
@@ -286,7 +293,7 @@ white-space: normal;
   <!-- Main Sidebar Container -->
   <aside class="main-sidebar sidebar-dark-primary elevation-4">
     <!-- Brand Logo -->
-    <a href="index3.html" class="brand-link">
+    <a href="#" class="brand-link">
       <img src="./iconspng/logo.png" alt="Our Logo" class="brand-image img-circle elevation-3" style="opacity: .8">
       <span class="brand-text font-weight-light">Management</span>
     </a>
@@ -321,75 +328,298 @@ white-space: normal;
           <!-- Add icons to the links using the .nav-icon class
                with font-awesome or any other icon font library -->
           
-               <!-- <li class="nav-item">
-            <a href="user_dashboard.php" class="nav-link">
+          <li class="nav-item">
+            <a href="dashboard.php" class="nav-link">
             <i class="nav-icon fas fa-tachometer-alt"></i>
               <p>
                 Dashboard
                 <span class="right badge badge-danger"></span>
               </p>
             </a>
-          </li> -->
+          </li>
 
-          <li class="nav-item">
-                <a href="userdine_in.php" class="nav-link">
-                  <i class="nav-icon fas fa-hand-point-right"></i>
-                  <p>POS</p>
-                </a>
-              </li>
-              <!-- <li class="nav-item">
-                <a href="forsenior.php" class="nav-link">
-                  <i class="nav-icon fas fa-hand-point-right"></i>
-                  <p>POS1</p>
-                </a>
-              </li> -->
-              <li class="nav-item">
-                <a href="user_orderlist.php" class="nav-link">
-                  <i class="nav-icon fas fa-exchange"></i>
-                  <p>Orders</p>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="stock_registry1.php" class="nav-link">
+          <li class="nav-item" >
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-cubes"></i>
+              <p>
+                Inventory
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="margin-left: 2em;">
+            <li class="nav-item">
+                <a href="stock_registry.php" class="nav-link">
                   <i class="nav-icon fas fa-plus-square"></i>
                   <p>Stock Entry Form</p>
                 </a>
               </li>
-
-              <li class="nav-item">
-                <a href="user_deducted_stock.php" class="nav-link">
-                  <i class="nav-icon fas fa-circle-minus"></i>
-                  <p>Usage Tracker</p>
-                </a>
-              </li>
-
-              <li class="nav-item">
-                <a href="user_add_product.php" class="nav-link">
-                  <i class="nav-icon fas fa-circle-plus"></i>
+            <li class="nav-item">
+                <a href="add_productwithchart.php" class="nav-link">
+                  <i class="nav-icon fas fa-plus"></i>
                   <p>Barcode Entry</p>
                 </a>
               </li>
 
               <li class="nav-item">
-                <a href="user_stock_list.php" class="nav-link">
+                <a href="deducted_stock.php" class="nav-link">
+                  <i class="nav-icon fas fa-circle-minus"></i>
+                  <p>Usage Tracker</p>
+                </a>
+              </li>
+
+              
+
+              
+
+              <li class="nav-item">
+                <a href="stock_list.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
                   <p>Product List</p>
                 </a>
               </li>
 
               <li class="nav-item">
-                <a href="user_menu_list2.php" class="nav-link">
+            <a href="category.php" class="nav-link">
+            <i class="nav-icon fas fa-table"></i>
+              <p>Category</p>
+            </a>
+          </li>
+             
+            </ul>
+          </li>
+
+          
+
+          <li class="nav-item" >
+            <a href="dine_in.php" class="nav-link">
+              <i class="nav-icon fas fa-smile"></i>
+              <p>
+                POS
+                <!-- <i class="right fas fa-angle-left"></i> -->
+              </p>
+            </a>
+            <!-- <ul class="nav nav-treeview" style="margin-left: 2em;">
+            <li class="nav-item">
+                <a href="dine_in.php" class="nav-link">
+                  <i class="nav-icon fas fa-hand-point-right"></i>
+                  <p>Add Order</p>
+                </a>
+              </li> -->
+
+              <!-- <li class="nav-item">
+                <a href="do.php" class="nav-link">
+                  <i class="nav-icon fas fa-hand-point-right"></i>
+                  <p>D/O Category</p>
+                </a>
+              </li> -->
+
+              
+             
+            <!-- </ul> -->
+          </li>
+
+          
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-utensils"></i>
+              <p>
+                Menu
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="margin-left: 2em;">
+            <li class="nav-item">
+                <a href="add_menu.php" class="nav-link">
+                  <i class="nav-icon fas fa-plus"></i>
+                  <p>Add Menu</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="menu_list1.php" class="nav-link">
                   <i class="nav-icon fas fa-list"></i>
                   <p>Menu List</p>
                 </a>
               </li>
 
+              <li class="nav-item">
+                <a href="menu_category.php" class="nav-link">
+                  <i class="nav-icon fa fa-ellipsis-h"></i>
+                  <p>Menu Category</p>
+                </a>
+              </li>
+
+              
+             
+            </ul>
+          </li>
+          
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-bar-chart"></i>
+              <p>
+              Sales Report
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="margin-left: 2em;">
+            <li class="nav-item">
+                <a href="order_list.php" class="nav-link">
+                  <i class="nav-icon fas fa-exchange"></i>
+                  <p>Orders</p>
+                </a>
+              </li>
+
+               <li class="nav-item">
+                <a href="tablereport.php" class="nav-link">
+                  <i class="nav-icon fas fa-chart-line"></i>
+                  <p>Table Report</p>
+                </a>
+              </li>
+
+              <li class="nav-item">
+                <a href="graphreport.php" class="nav-link">
+                  <i class="nav-icon fas fa-chart-pie"></i>
+                  <p>Graph Report</p>
+                </a>
+              </li>
+<!--
+              <li class="nav-item">
+                <a href="menu_category.php" class="nav-link">
+                  <i class="nav-icon fa fa-ellipsis-h"></i>
+                  <p>Menu Category</p>
+                </a>
+              </li> -->
+
+              
+             
+            </ul>
+          </li>
+          <!-- <li class="nav-item">
+            <a href="order_list.php" class="nav-link">
+            <i class="nav-icon fas fa-bar-chart"></i>
+              <p>
+                Sales Report
+                
+              </p>
+            </a>
+          </li>  -->
+<!--
+          <li class="nav-item">
+            <a href="productlist.php" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+              <p>
+                Product List
+                
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-book"></i>
+              <p>
+                POS
+                
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-list"></i>
+              <p>
+                Order List
+                
+              </p>
+            </a>
+          </li> -->
+
+          <!-- <li class="nav-item">
+            <a href="#" class="nav-link">
+            <i class="nav-icon fas fa-chart-pie"></i>
+              <p>
+                Sales Report
+                
+              </p>
+            </a>
+          </li> -->
+
+          <li class="nav-item">
+            <a href="taxdis.php" class="nav-link">
+            <i class="nav-icon fas fa-calculator"></i>
+              <p>
+                Tax
+                
+              </p>
+            </a>
+          </li>
+
+
+          <li class="nav-item">
+            <a href="users.php" class="nav-link">
+            <i class="nav-icon fas fa-users"></i>
+              <p>
+                Manage Users
+                
+              </p>
+            </a>
+          </li>
+
+          <li class="nav-item">
+            <a href="#" class="nav-link">
+              <i class="nav-icon fas fa-gear"></i>
+              <p>
+              Settings
+                <i class="right fas fa-angle-left"></i>
+              </p>
+            </a>
+            <ul class="nav nav-treeview" style="margin-left: 2em;">
+            <li class="nav-item">
+                <a href="backup.php" class="nav-link">
+                  <i class="nav-icon fas fa-exchange"></i>
+                  <p>Back Up Data</p>
+                </a>
+              
+              </li>
+
+              <li class="nav-item">
+                <a href="notiffsettings.php" class="nav-link">
+                  <i class="nav-icon fas fa-bell"></i>
+                  <p>Notification Settings</p>
+                </a>
+              
+              </li>
+
+          
+
+          <!-- <li class="nav-item">
+            <a href="changepassword.php" class="nav-link">
+            <i class="nav-icon fas fa-user-lock"></i>
+              <p>
+              Change Password
+              </p>
+            </a>
+          </li> -->
 
           <li class="nav-item">
             <a href="logout.php" class="nav-link">
             <i class="nav-icon fas fa-sign-out-alt"></i>
               <p>
                 Logout
+                
+              </p>
+            </a>
+          </li>
+
+        </ul>
+
+        <li class="nav-item">
+            <a href="contactform.php" class="nav-link">
+            <i class="nav-icon fas fa-at"></i>
+              <p>
+                Contact/Report
                 
               </p>
             </a>

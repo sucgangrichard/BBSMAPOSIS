@@ -165,7 +165,7 @@ if($insert->execute()){
 {
      
   
-      $_SESSION['status']="only jpg, jpeg, png and gif can be upload";
+      $_SESSION['status']="Invalid File Format";
       $_SESSION['status_code']="warning";
 
 } 
@@ -187,7 +187,7 @@ if($insert->execute()){
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Add Menu</h1>
+          <!-- <h1 class="m-0">Add Menu</h1> -->
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
@@ -207,7 +207,7 @@ if($insert->execute()){
         <div class="col-lg-12">
         
 
-        <div class="card card-primary card-outline">
+        <div class="card card-dark card-outline">
             <div class="card-header">
               <h5 class="m-0">Add Menu Form</h5>
             </div>
@@ -298,6 +298,7 @@ extract($row);
 
     <div class="form-group">
      <label >Received Date</label>
+     <!-- <input type="text" class="form-control" name="date_1" placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}" required> -->
      <div class="input-group date" id="date_1" data-target-input="nearest">
                         <input type="text" class="form-control date_1" data-target="#date_1" name="date_1"  placeholder="YYYY-MM-DD" pattern="\d{4}-\d{2}-\d{2}"  required/>
                         <div class="input-group-append" data-target="#date_1" data-toggle="datetimepicker">

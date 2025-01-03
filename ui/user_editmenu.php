@@ -2,19 +2,19 @@
 include_once 'conndb.php';
 ob_start();
 session_start();
-if($_SESSION['username']==""  OR $_SESSION['role']=="User"){
+if($_SESSION['username']==""  OR $_SESSION['role']=="Admin"){
 
-  header('location:../index.php');
+    header('location:../index.php');
+    
+    }
   
-  }
-
-
-  if($_SESSION['role']=="Admin"){
-    include_once'header.php';
-  }else{
   
-    include_once'headeruser.php';
-  }
+    if($_SESSION['role']=="User"){
+      include_once'headeruser.php';
+    }else{
+    
+      include_once'header.php';
+    }
 
 
 $id = $_GET['id'];
@@ -66,12 +66,8 @@ if(isset($_POST['btneditproduct'])){
         if($f_size>=1000000 ){
           $_SESSION['status']="Max file should be 1MB";
           $_SESSION['status_code']="warning";
-          header('Location: edit_menu.php?id=' . $id); // Redirect to edit_menu.php
-            exit(); // Ensure no further code is executed
-          
         } else {
           if(move_uploaded_file($f_tmp,$store)){
-            
             $update = $pdo->prepare("UPDATE tbl_mmenu SET product_name=:product_name, category=:category, price=:price, available=:available, updated_date=:updated_date, approved_by=:approved_by, image=:image WHERE menu_id=$id");
   
             $update->bindParam(':product_name', $product_name_txt);
@@ -85,7 +81,7 @@ if(isset($_POST['btneditproduct'])){
             // header('Location: menu_list1.php');
             if($update->execute()){
               
-              $_SESSION['status']="Product Updated Successfully";
+              $_SESSION['status']="Product Updated Successfully With New Image";
               // header('Location: menu_list1.php');
               $_SESSION['status_code']="success";
               // header('Location: menu_list1.php');
@@ -111,7 +107,7 @@ if(isset($_POST['btneditproduct'])){
         $update->bindParam(':image', $f_newfile);
         
         if($update->execute()){
-          $_SESSION['status']="Product Updated Successfully";
+          $_SESSION['status']="Product Updated Successfully With New Image";
           $_SESSION['status_code']="success";
           
           
@@ -125,7 +121,7 @@ if(isset($_POST['btneditproduct'])){
 
 
  }
- 
+ header('Location: user_menu_list2.php');
 
 
 
@@ -319,7 +315,7 @@ extract($row);
     <div class="form-group">
                     <label >Menu Image</label><br>
                     <image src="menuimages/<?php echo $image_db;?>" class="img-rounded" width="50px" height="50px/">
-                    <input type="file" class="input-group"   name="myfile">
+                    <input type="file" class="input-group"   name="myfile" required>
                     <p>Upload image</p>
                   </div>
 

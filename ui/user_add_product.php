@@ -121,7 +121,7 @@ th{background: #eee;}
 
         <div class="card card-primary card-outline">
             <div class="card-header">
-            <h5 class="m-0">Add stock quantity with barcode</h5>
+            <h5 class="m-0">Barcode Entry</h5>
             
             </div>
             <div class="card-body">
